@@ -1,7 +1,7 @@
 {
   "name": "napthe-shop",
   "version": "1.0.0",
-  "description": "Shop nạp thẻ auto thesieure",
+  "description": "Shop nạp thẻ auto theSieuRe",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,6 +10,7 @@
     "express": "^4.18.2",
     "body-parser": "^1.20.2",
     "md5": "^2.3.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "axios": "^1.6.7"
   }
 }
