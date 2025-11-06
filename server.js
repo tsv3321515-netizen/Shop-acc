@@ -1,16 +1,39 @@
 const express = require("express");
-const app = express();
 const path = require("path");
+const axios = require("axios");
+const { PARTNER_ID, API_KEY } = require("./config");
 
-// Cho phép phục vụ các file tĩnh (HTML, CSS, JS...) trong thư mục "public"
+const app = express();
 app.use(express.static("public"));
+app.use(express.json());
 
-// Khi truy cập trang chủ "/"
+// Trang chủ
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Cổng Render sẽ tự động gán (hoặc mặc định là 10000)
+// API nạp thẻ
+app.post("/api/napthe", async (req, res) => {
+  try {
+    const { seri, code, menhgia, loaithe } = req.body;
+
+    const response = await axios.post("https://thesieure.com/chargingws/v2", {
+      partner_id: PARTNER_ID,
+      sign: API_KEY,
+      code: code,
+      serial: seri,
+      telco: loaithe,
+      amount: menhgia,
+      command: "charging"
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: "Lỗi khi gọi API Thesieure" });
+  }
+});
+
 const port = process.env.PORT || 10000;
 app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
