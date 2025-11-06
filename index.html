@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nạp Thẻ Tự Động - TheSieuRe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      padding: 20px;
+    }
+    .card {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Nạp Thẻ Tự Động</h2>
+  <label>Nhà mạng:</label>
+  <select id="telco">
+    <option value="VIETTEL">Viettel</option>
+    <option value="MOBIFONE">Mobifone</option>
+    <option value="VINAPHONE">Vinaphone</option>
+    <option value="ZING">Zing</option>
+    <option value="GARENA">Garena</option>
+  </select>
+
+  <label>Mệnh giá:</label>
+  <select id="amount">
+    <option value="10000">10.000đ</option>
+    <option value="20000">20.000đ</option>
+    <option value="50000">50.000đ</option>
+    <option value="100000">100.000đ</option>
+    <option value="200000">200.000đ</option>
+  </select>
+
+  <label>Mã thẻ:</label>
+  <input type="text" id="code" placeholder="Nhập mã thẻ">
+
+  <label>Số seri:</label>
+  <input type="text" id="serial" placeholder="Nhập số seri">
+
+  <button onclick="napThe()">Nạp Thẻ</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+async function napThe() {
+  const telco = document.getElementById('telco').value;
+  const code = document.getElementById('code').value;
+  const serial = document.getElementById('serial').value;
+  const amount = document.getElementById('amount').value;
+  const requestId = Date.now(); // mã giao dịch riêng
+
+  // 🔐 Thay thông tin API của bạn tại đây
+  const PARTNER_ID = "YOUR_PARTNER_ID";
+  const PARTNER_KEY = "YOUR_PARTNER_KEY";
+
+  const data = {
+    telco,
+    code,
+    serial,
+    amount,
+    request_id: requestId,
+    partner_id: PARTNER_ID,
+    sign: CryptoJS.MD5(PARTNER_KEY + code + serial).toString(), 
+    command: "charging"
+  };
+
+  const response = await fetch("https://thesieure.com/chargingws/v2", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+  document.getElementById('result').innerText = 
+    "Kết quả: " + (result.message || JSON.stringify(result));
+}
+</script>
+
+<!-- Thêm thư viện mã hóa MD5 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+</body>
+</html>
