@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const axios = require("axios");
-const { PARTNER_ID, API_KEY } = require("./config");
+const { PARTNER_ID, API_KEY } = require("./config.js");
 
 const app = express();
 app.use(express.static("public"));
