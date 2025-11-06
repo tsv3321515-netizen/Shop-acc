@@ -1,11 +1,89 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Shop Acc</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nạp Thẻ - ShopAcc</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+      margin-top: 40px;
+    }
+    input, select, button {
+      margin: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #1e90ff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0a74da;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #222;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Chào mừng đến Shop Acc!</h1>
-  <p>Website đang hoạt động thành công trên Render 🎉</p>
+  <h1>💳 NẠP THẺ TỰ ĐỘNG - SHOP ACC</h1>
+
+  <form id="naptheForm">
+    <select id="loaithe" required>
+      <option value="">-- Chọn loại thẻ --</option>
+      <option value="VIETTEL">Viettel</option>
+      <option value="MOBIFONE">Mobifone</option>
+      <option value="VINAPHONE">Vinaphone</option>
+    </select><br>
+    
+    <input type="text" id="menhgia" placeholder="Mệnh giá (VD: 10000)" required><br>
+    <input type="text" id="seri" placeholder="Số Seri" required><br>
+    <input type="text" id="code" placeholder="Mã Thẻ" required><br>
+    
+    <button type="submit">NẠP THẺ</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const form = document.getElementById("naptheForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        loaithe: document.getElementById("loaithe").value,
+        menhgia: document.getElementById("menhgia").value,
+        seri: document.getElementById("seri").value,
+        code: document.getElementById("code").value
+      };
+
+      resultDiv.innerHTML = "⏳ Đang xử lý, vui lòng chờ...";
+
+      try {
+        const res = await fetch("/api/napthe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+        resultDiv.innerHTML = `<b>Kết quả:</b> ${JSON.stringify(json)}`;
+      } catch (err) {
+        resultDiv.innerHTML = "❌ Có lỗi xảy ra khi kết nối server!";
+      }
+    });
+  </script>
 </body>
 </html>
