@@ -1,8 +1,10 @@
 const express = require("express");
-const fetch = (...args) => import("node-fetch").then(({default: fetch}) => fetch(...args));
 const md5 = require("md5");
 const bodyParser = require("body-parser");
 const { PARTNER_ID, API_KEY } = require("./config.js");
+
+// node-fetch fix cho CommonJS
+const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 app.use(bodyParser.json());
@@ -34,9 +36,6 @@ app.post("/api/napthe", async (req, res) => {
     res.status(500).json({ error: "Lỗi máy chủ hoặc API" });
   }
 });
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`✅ Server đang chạy cổng ${PORT}`));});
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`✅ Server đang chạy cổng ${PORT}`));
