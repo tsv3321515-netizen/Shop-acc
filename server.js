@@ -1,17 +1,40 @@
-const crypto = require("crypto");
+import express from "express";
+import fetch from "node-fetch";
+import md5 from "md5";
+import bodyParser from "body-parser";
+import { PARTNER_ID, API_KEY } from "./config.js";
 
-const command = "charging";
-const sign = crypto
-  .createHash("md5")
-  .update(PARTNER_ID + code + seri + loaithe + command + API_KEY)
-  .digest("hex");
+const app = express();
+app.use(bodyParser.json());
 
-const response = await axios.post("https://thesieure.com/chargingws/v2", {
-  partner_id: PARTNER_ID,
-  sign: sign,
-  code: code,
-  serial: seri,
-  telco: loaithe,
-  amount: menhgia,
-  command: command
+app.post("/api/napthe", async (req, res) => {
+  const { telco, code, serial, amount } = req.body;
+  const request_id = Math.floor(Math.random() * 1000000000).toString();
+
+  const sign = md5(PARTNER_ID + code + serial + API_KEY);
+
+  try {
+    const response = await fetch("https://thesieure.com/chargingws/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partner_id: PARTNER_ID,
+        sign,
+        code,
+        serial,
+        telco,
+        amount,
+        request_id
+      }),
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi máy chủ hoặc API" });
+  }
 });
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`✅ Server đang chạy cổng ${PORT}`));
