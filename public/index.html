@@ -1,137 +1,33 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shop Acc - Nạp & Mua Tài Khoản</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      color: #58a6ff;
-      margin-bottom: 20px;
-    }
-    input, select, button {
-      margin: 6px;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-    }
-    button {
-      background: #238636;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #2ea043;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 10px;
-      background: #161b22;
-      border-radius: 10px;
-    }
-    hr {
-      margin: 30px 0;
-      border: 1px solid #30363d;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Shop Acc - Nạp Thẻ Tự Động</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>💳 NẠP THẺ & MUA ACC RANDOM</h1>
+  <h1>SHOP ACC</h1>
 
-  <!-- Nạp thẻ -->
-  <h2>⚡ Nạp Thẻ</h2>
-  <form id="naptheForm">
-    <select id="loaithe" required>
-      <option value="">-- Chọn loại thẻ --</option>
+  <div class="section">
+    <h2>Nạp thẻ</h2>
+    <input id="user" placeholder="Tên người dùng"><br>
+    <select id="telco">
       <option value="VIETTEL">Viettel</option>
-      <option value="MOBIFONE">Mobifone</option>
       <option value="VINAPHONE">Vinaphone</option>
+      <option value="MOBIFONE">Mobifone</option>
     </select><br>
-    <input type="text" id="menhgia" placeholder="Mệnh giá (VD: 10000)" required><br>
-    <input type="text" id="seri" placeholder="Số Seri" required><br>
-    <input type="text" id="code" placeholder="Mã Thẻ" required><br>
-    <button type="submit">NẠP THẺ</button>
-  </form>
-  <div class="result" id="result"></div>
+    <input id="amount" placeholder="Mệnh giá (10000...)"><br>
+    <input id="seri" placeholder="Seri"><br>
+    <input id="code" placeholder="Mã thẻ"><br>
+    <button onclick="napThe()">Nạp ngay</button>
+    <p id="naptheResult"></p>
+  </div>
 
-  <hr>
+  <div class="section">
+    <h2>Danh sách acc</h2>
+    <div id="accList"></div>
+  </div>
 
-  <!-- Tài khoản -->
-  <h2>👤 Tài Khoản</h2>
-  <input type="text" id="username" placeholder="Nhập username của bạn"><br>
-  <button id="checkBalance">🔍 Kiểm tra số dư</button>
-  <div class="result" id="balance"></div>
-
-  <hr>
-
-  <!-- Mua acc -->
-  <h2>🎮 Mua Acc Random</h2>
-  <button id="buyAcc">🛒 Mua Acc May Mắn</button>
-  <div class="result" id="accInfo"></div>
-
-  <script>
-    const API = "https://shop-acc-12.onrender.com"; // đổi sang domain Render của bạn
-
-    // --- NẠP THẺ ---
-    const form = document.getElementById("naptheForm");
-    const resultDiv = document.getElementById("result");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = {
-        loaithe: document.getElementById("loaithe").value,
-        menhgia: document.getElementById("menhgia").value,
-        seri: document.getElementById("seri").value,
-        code: document.getElementById("code").value
-      };
-      resultDiv.innerHTML = "⏳ Đang xử lý...";
-      try {
-        const res = await fetch(`${API}/api/napthe`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const json = await res.json();
-        resultDiv.innerHTML = `<b>Kết quả:</b> ${json.message || "Nạp thành công!"}`;
-      } catch (err) {
-        resultDiv.innerHTML = "❌ Có lỗi khi kết nối server!";
-      }
-    });
-
-    // --- KIỂM TRA SỐ DƯ ---
-    document.getElementById("checkBalance").onclick = async () => {
-      const username = document.getElementById("username").value.trim();
-      if (!username) return alert("Nhập username trước!");
-      const res = await fetch(`${API}/api/checkBalance?username=${username}`);
-      const data = await res.json();
-      document.getElementById("balance").innerText = data.balance
-        ? `💰 Số dư: ${data.balance}đ`
-        : "Không tìm thấy user!";
-    };
-
-    // --- MUA ACC RANDOM ---
-    document.getElementById("buyAcc").onclick = async () => {
-      const username = document.getElementById("username").value.trim();
-      if (!username) return alert("Nhập username trước!");
-      const res = await fetch(`${API}/api/buyAcc`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username })
-      });
-      const data = await res.json();
-      document.getElementById("accInfo").innerText = data.account
-        ? `🎯 Bạn nhận được acc: ${data.account.acc} (${data.account.game})`
-        : data.error || "❌ Lỗi mua acc!";
-    };
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
