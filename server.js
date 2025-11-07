@@ -1,93 +1,68 @@
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const axios = require("axios");
-
+const express = require('express');
+const fs = require('fs-extra');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const cors = require('cors');
 const app = express();
-app.use(express.static("public"));
-app.use(express.json());
 
-// 🔐 Biến môi trường (Render / .env)
-const PARTNER_ID = process.env.PARTNER_ID;
-const API_KEY = process.env.API_KEY;
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-// 📂 Đường dẫn file dữ liệu
-const USERS_FILE = path.join(__dirname, "users.json");
-const ACCOUNTS_FILE = path.join(__dirname, "accounts.json");
+// === CẤU HÌNH API THESIEURE ===
+const API_KEY = "YOUR_THESIEURE_API_KEY";
+const API_URL = "https://thesieure.com/chargingws/v2";
 
-// 🏠 Trang chủ
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// 🧑‍💻 Đăng nhập
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body;
-  const users = JSON.parse(fs.readFileSync(USERS_FILE));
-
-  const user = users.find(
-    (u) => u.username === username && u.password === password
-  );
-
-  if (!user) return res.status(401).json({ success: false, message: "Sai tài khoản hoặc mật khẩu" });
-
-  res.json({ success: true, balance: user.balance });
-});
-
-// 💳 Nạp thẻ (Thesieure API)
-app.post("/api/napthe", async (req, res) => {
-  const { username, card_type, pin, seri, amount } = req.body;
-  const users = JSON.parse(fs.readFileSync(USERS_FILE));
-  const user = users.find((u) => u.username === username);
-  if (!user) return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản" });
+// === NẠP THẺ ===
+app.post('/api/napthe', async (req, res) => {
+  const { seri, code, telco, amount, user } = req.body;
+  if (!seri || !code || !telco || !user)
+    return res.json({ success: false, message: "Thiếu thông tin" });
 
   try {
-    const response = await axios.post("https://thesieure.com/chargingws/v2", {
-      partner_id: PARTNER_ID,
-      api_key: API_KEY,
-      code: pin,
-      serial: seri,
-      telco: card_type,
-      amount: amount,
-      request_id: Date.now().toString(),
-      command: "charging"
+    const response = await axios.post(API_URL, {
+      APIkey: API_KEY,
+      mathe: code,
+      seri: seri,
+      menhgia: amount,
+      type: telco,
+      content: user
     });
 
     if (response.data.status === 1) {
-      user.balance += parseInt(amount);
-      fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-      res.json({ success: true, message: "Nạp thành công!", balance: user.balance });
+      res.json({ success: true, message: "Nạp thẻ thành công!", data: response.data });
     } else {
-      res.json({ success: false, message: "Thẻ lỗi hoặc sai mệnh giá" });
+      res.json({ success: false, message: "Nạp thất bại: " + response.data.msg });
     }
   } catch (err) {
-    console.error(err);
-    res.json({ success: false, message: "Lỗi máy chủ nạp thẻ" });
+    res.json({ success: false, message: "Lỗi server hoặc API" });
   }
 });
 
-// 🛒 Mua acc
-app.post("/api/mua", (req, res) => {
+// === MUA ACC ===
+app.get('/api/accounts', async (req, res) => {
+  const data = await fs.readJson('./accounts.json');
+  res.json(data);
+});
+
+app.post('/api/buy', async (req, res) => {
   const { username, accId } = req.body;
-  const users = JSON.parse(fs.readFileSync(USERS_FILE));
-  const accounts = JSON.parse(fs.readFileSync(ACCOUNTS_FILE));
+  let users = await fs.readJson('./users.json');
+  let accounts = await fs.readJson('./accounts.json');
 
-  const user = users.find((u) => u.username === username);
-  const acc = accounts.find((a) => a.id === accId && !a.sold);
+  let user = users.find(u => u.username === username);
+  let acc = accounts.find(a => a.id === accId);
 
-  if (!user) return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản" });
-  if (!acc) return res.status(404).json({ success: false, message: "Acc đã bán hoặc không tồn tại" });
+  if (!user || !acc) return res.json({ success: false, message: "Không tìm thấy" });
   if (user.balance < acc.price) return res.json({ success: false, message: "Không đủ tiền" });
 
   user.balance -= acc.price;
   acc.sold = true;
 
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-  fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
+  await fs.writeJson('./users.json', users, { spaces: 2 });
+  await fs.writeJson('./accounts.json', accounts, { spaces: 2 });
 
-  res.json({ success: true, message: "Mua thành công!", balance: user.balance, acc });
+  res.json({ success: true, message: "Mua thành công!", acc });
 });
 
-// 🚀 Khởi động server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server chạy tại cổng ${PORT}`));
+app.listen(3000, () => console.log('Server chạy tại http://localhost:3000'));
