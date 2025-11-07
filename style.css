@@ -1,1 +1,6 @@
-
+body { font-family: Arial; background: #f4f4f4; text-align: center; }
+h1 { color: #333; }
+.section { background: white; margin: 20px auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 10px; box-shadow: 0 0 5px gray; }
+input, select { margin: 5px; padding: 8px; width: 90%; }
+button { padding: 8px 15px; margin-top: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+.acc { background: #eee; margin: 5px; padding: 10px; border-radius: 5px; }
