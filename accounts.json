@@ -1,38 +1,26 @@
 [
   {
     "id": 1,
-    "game": "Liên Quân",
-    "username": "minh tran",
-    "password": "demo",
-    "price": 20000,
-    "status": "available",
-    "luck": "rất may mắn"
+    "game": "Free Fire",
+    "username": "ff_user1@gmail.com",
+    "password": "123456",
+    "price": 10000,
+    "sold": false
   },
   {
     "id": 2,
     "game": "Liên Quân",
-    "username": "minh tran",
-    "password": "demo",
-    "price": 15000,
-    "status": "available",
-    "luck": "may mắn vừa"
+    "username": "lq_user1@gmail.com",
+    "password": "654321",
+    "price": 20000,
+    "sold": false
   },
   {
     "id": 3,
     "game": "Roblox",
-    "username": "rb_hero03",
-    "password": "roblox123",
-    "price": 25000,
-    "status": "available",
-    "luck": "hên xui"
-  },
-  {
-    "id": 4,
-    "game": "Roblox",
-    "username": "rb_pro04",
-    "password": "viproblox",
-    "price": 30000,
-    "status": "sold",
-    "luck": "may mắn thấp"
+    "username": "roblox_pro123",
+    "password": "abc123",
+    "price": 15000,
+    "sold": false
   }
 ]
