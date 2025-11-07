@@ -1,16 +1,15 @@
 {
-  "name": "napthe-shop",
+  "name": "shop-acc",
   "version": "1.0.0",
-  "description": "Shop nạp thẻ auto theSieuRe",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.19.2",
+    "axios": "^1.7.4",
     "body-parser": "^1.20.2",
-    "md5": "^2.3.0",
-    "node-fetch": "^3.3.2",
-    "axios": "^1.6.7"
+    "fs-extra": "^11.2.0",
+    "cors": "^2.8.5"
   }
 }
